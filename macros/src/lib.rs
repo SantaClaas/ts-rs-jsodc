@@ -49,11 +49,11 @@ impl DerivedTS {
     fn into_impl(self, rust_ty: Ident, generics: Generics) -> TokenStream {
         let export_to = match &self.export_to {
             Some(dirname) if dirname.ends_with('/') => {
-                format!("{}{}.ts", dirname, self.name)
+                format!("{}{}.js", dirname, self.name)
             }
             Some(filename) => filename.clone(),
             None => {
-                format!("bindings/{}.ts", self.name)
+                format!("bindings/{}.js", self.name)
             }
         };
 

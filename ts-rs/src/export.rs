@@ -59,7 +59,7 @@ pub(crate) fn export_type_to<T: TS + ?Sized + 'static, P: AsRef<Path>>(
     Ok(())
 }
 
-/// Returns the generated defintion for `T`.
+/// Returns the generated definition for `T`.
 pub(crate) fn export_type_to_string<T: TS + ?Sized + 'static>() -> Result<String, ExportError> {
     let mut buffer = String::with_capacity(1024);
     buffer.push_str(NOTE);
@@ -78,8 +78,12 @@ fn output_path<T: TS + ?Sized>() -> Result<PathBuf, ExportError> {
 
 /// Push the declaration of `T`
 fn generate_decl<T: TS + ?Sized>(out: &mut String) {
-    out.push_str("export ");
-    out.push_str(&T::decl());
+    out.push_str("/** @typedef {");
+    // Name comes after definition compared to TypeScript so we can't use decl()
+    out.push_str(&T::inline());
+    out.push_str("} ");
+    out.push_str(&T::name());
+    out.push_str(" */");
 }
 
 /// Push an import statement for all dependencies of `T`
@@ -97,8 +101,8 @@ fn generate_imports<T: TS + ?Sized + 'static>(out: &mut String) -> Result<(), Ex
         let rel_path = import_path(path, Path::new(dep.exported_to));
         writeln!(
             out,
-            "import type {{ {} }} from {:?};",
-            &dep.ts_name, rel_path
+            "import {:?};",
+            rel_path
         )
         .unwrap();
     }
